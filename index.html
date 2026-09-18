@@ -1,25 +1,146 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f2937"><link rel="manifest" href="manifest.json"><title>Menu settimanale</title>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#18212b">
+<link rel="manifest" href="manifest.json">
+<title>Menu settimanale</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f5f7;color:#18202a}header{background:#1f2937;color:#fff;padding:20px 16px 17px;position:sticky;top:0;z-index:5}h1{font-size:22px;margin:0 0 4px}.sub{font-size:13px;opacity:.75}main{max-width:720px;margin:auto;padding:12px 12px 85px}.day{background:#fff;border-radius:15px;margin:10px 0;overflow:hidden;box-shadow:0 1px 5px #0001}.day h2{font-size:16px;margin:0;padding:13px;background:#eef0f3}.meal{padding:11px 13px;border-top:1px solid #eee}.meal strong{display:block;font-size:13px;margin-bottom:6px}.meal input{width:100%;padding:10px;border:1px solid #d5d9df;border-radius:9px;font-size:14px}.actions{display:flex;gap:8px;margin:10px 0 15px}.btn{border:0;border-radius:10px;padding:11px 13px;font-weight:600}.primary{background:#1f2937;color:#fff}.secondary{background:#e9edf1}.tab{display:none}.tab.active{display:block}nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:10}nav button{flex:1;border:0;background:#fff;padding:10px;color:#69727d;font-size:12px}nav button.active{color:#111827;font-weight:700}.cat{background:#fff;border-radius:14px;margin:10px 0;overflow:hidden}.cat h3{margin:0;padding:12px 14px;font-size:14px}.item{padding:10px 14px;border-top:1px solid #eee;display:flex;gap:9px;align-items:center;font-size:14px}.item input{width:19px;height:19px}.empty{text-align:center;color:#777;padding:25px}.note{font-size:12px;color:#69727d}
-</style></head><body>
+*{box-sizing:border-box}body{margin:0;background:#f4f5f7;color:#18212b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#18212b;color:white;padding:18px 16px 16px;position:sticky;top:0;z-index:20}h1{font-size:21px;margin:0 0 4px}.sub{font-size:12px;opacity:.72}
+main{max-width:760px;margin:auto;padding:12px 12px 94px}.tab{display:none}.tab.active{display:block}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}.btn{border:0;border-radius:11px;padding:11px 13px;font-weight:700;font-size:13px}.primary{background:#18212b;color:#fff}.secondary{background:#e7ebef;color:#18212b}
+.status{min-height:18px;font-size:12px;color:#4b5563;margin:3px 2px 8px}
+.day{background:#fff;border-radius:16px;margin:11px 0;overflow:hidden;box-shadow:0 1px 5px #0001}.day h2{font-size:16px;margin:0;padding:13px;background:#e9edf1}
+.meal{padding:12px 13px;border-top:1px solid #eee}.meal-title{font-size:13px;font-weight:750;margin-bottom:7px}.controls{display:flex;gap:7px}.controls select,.controls input,.custom input{min-width:0;padding:10px;border:1px solid #d3d8df;border-radius:9px;background:#fff;font-size:14px}.controls select{flex:1}.portions{width:82px}.custom{display:none;margin-top:7px}.custom.show{display:block}.custom input{width:100%}
+.hint{font-size:11px;color:#737b85;margin-top:5px}
+.shop-title{font-size:18px;margin:4px 0 8px}.note{font-size:12px;color:#69727d;margin:0 2px 12px}.cat{background:#fff;border-radius:14px;margin:10px 0;overflow:hidden}.cat h3{font-size:14px;margin:0;padding:12px 14px}.item{display:flex;align-items:center;gap:9px;padding:10px 14px;border-top:1px solid #eee;font-size:14px}.item input{width:19px;height:19px}.amount{margin-left:auto;color:#68717b;font-size:13px}
+.empty{text-align:center;padding:28px;color:#777;background:#fff;border-radius:14px}
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #ddd;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:30}nav button{flex:1;border:0;background:#fff;padding:10px;color:#69727d;font-size:12px}nav button.active{color:#18212b;font-weight:800}
+</style>
+</head>
+<body>
 <header><h1>Menu settimanale</h1><div class="sub" id="week"></div></header>
-<main><section id="menu" class="tab active"></section><section id="shopping" class="tab">
-<div class="actions"><button class="btn primary" onclick="buildShopping()">Aggiorna lista</button><button class="btn secondary" onclick="clearChecks()">Azzera</button></div>
-<div class="note">La lista raccoglie automaticamente gli ingredienti riconosciuti nel menu.</div><div id="list"></div></section></main>
-<nav><button id="nm" class="active" onclick="showTab('menu')">🏠<br>Menu</button><button id="ns" onclick="showTab('shopping')">🛒<br>Spesa</button></nav>
+<main>
+<section id="menu" class="tab active">
+<div class="toolbar">
+<button class="btn primary" onclick="saveAll()">💾 Salva settimana</button>
+<button class="btn secondary" onclick="resetWeek()">↶ Ripristina esempio</button>
+<button class="btn secondary" onclick="copyWeek()">📋 Copia settimana</button>
+</div>
+<div id="status" class="status"></div>
+<div id="days"></div>
+</section>
+
+<section id="shopping" class="tab">
+<div class="toolbar">
+<button class="btn primary" onclick="buildShopping()">🛒 Aggiorna lista</button>
+<button class="btn secondary" onclick="clearChecks()">Azzera spunte</button>
+</div>
+<h2 class="shop-title">Lista della spesa</h2>
+<p class="note">Le quantità sono calcolate automaticamente in base ai pasti scelti e alle porzioni.</p>
+<div id="list"></div>
+</section>
+</main>
+
+<nav>
+<button id="nm" class="active" onclick="showTab('menu')">🏠<br>Menu</button>
+<button id="ns" onclick="showTab('shopping')">🛒<br>Spesa</button>
+</nav>
+
 <script>
-const days=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"], meals=["Colazione","Spuntino mattina","Pranzo","Spuntino pomeriggio","Cena"];
-const defaults=[["Yogurt greco + muesli + frutta","Frutta","Pasta + verdure + pollo","Mandorle","Pesce + verdure + pane"],["Latte + cereali + frutta","Yogurt","Riso + pollo + verdure","Frutta secca","Uova + verdure + pane"],["Yogurt + muesli + frutta","Frutta","Pasta al pomodoro + proteine + verdure","Yogurt","Pesce + verdure"],["Pane + marmellata + yogurt","Frutta","Riso + tonno + verdure","Mandorle","Carne + verdure + pane"],["Yogurt + muesli + frutta","Frutta","Pasta + legumi + verdure","Frutta secca","Pesce + verdure + pane"],["Cappuccino + brioche","Frutta","Pasto libero","—","Cena libera"],["Cappuccino + brioche","—","Pranzo libero","—","Pizza margherita + contorno"]];
-const ing={"yogurt":"Yogurt greco","muesli":"Muesli","frutta":"Frutta","pasta":"Pasta","verdure":"Verdure","pollo":"Petto di pollo","mandorle":"Mandorle","pesce":"Pesce","pane":"Pane","latte":"Latte","cereali":"Cereali","riso":"Riso","tonno":"Tonno","uova":"Uova","marmellata":"Marmellata","legumi":"Legumi","brioche":"Brioche","cappuccino":"Caffè + latte","pizza":"Pizza margherita"};
-let data=JSON.parse(localStorage.getItem("menu-data")||"null")||defaults.map(x=>[...x]);
-function save(){localStorage.setItem("menu-data",JSON.stringify(data))}
-function render(){menu.innerHTML=days.map((d,i)=>`<div class="day"><h2>${d}</h2>${meals.map((m,j)=>`<div class="meal"><strong>${m}</strong><input value="${esc(data[i][j]||"")}" onchange="data[${i}][${j}]=this.value;save()"></div>`).join("")}</div>`).join("");week.textContent=label()}
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
-function label(){let d=new Date(),n=d.getDay()||7,m=new Date(d);m.setDate(d.getDate()-n+1),s=new Date(m);s.setDate(m.getDate()+6);return `${m.toLocaleDateString("it-IT",{day:"2-digit",month:"long"})} – ${s.toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"})}`}
-function showTab(id){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");nm.classList.toggle("active",id==="menu");ns.classList.toggle("active",id==="shopping");if(id==="shopping")buildShopping()}
-function buildShopping(){let found={};data.flat().forEach(t=>{let s=t.toLowerCase();Object.keys(ing).forEach(k=>{if(s.includes(k))found[ing[k]]=1})});let a=Object.keys(found).sort();list.innerHTML=a.length?a.map(x=>`<label class="item"><input type="checkbox"> ${x}</label>`).join(""):"<div class='empty'>Nessun ingrediente riconosciuto.</div>"}
+const days=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+const meals=["Colazione","Spuntino mattina","Pranzo","Spuntino pomeriggio","Cena"];
+
+const recipes={
+"Yogurt greco + muesli + frutta":[["Yogurt greco",170,"g"],["Muesli",40,"g"],["Frutta",150,"g"]],
+"Latte + cereali + frutta":[["Latte",200,"ml"],["Cereali",40,"g"],["Frutta",150,"g"]],
+"Pane + marmellata + yogurt":[["Pane",60,"g"],["Marmellata",20,"g"],["Yogurt greco",125,"g"]],
+"Cappuccino + brioche":[["Caffè + latte",1,"porz."],["Brioche",1,"pz"]],
+"Uova + pane":[["Uova",2,"pz"],["Pane",60,"g"]],
+"Frutta":[["Frutta",150,"g"]],
+"Yogurt":[["Yogurt greco",125,"g"]],
+"10 mandorle":[["Mandorle",15,"g"]],
+"Frutta secca":[["Frutta secca",20,"g"]],
+"Nessuno":[],
+"Pasta + verdure + pollo":[["Pasta",80,"g"],["Verdure",200,"g"],["Petto di pollo",150,"g"]],
+"Riso + pollo + verdure":[["Riso",80,"g"],["Petto di pollo",150,"g"],["Verdure",200,"g"]],
+"Pasta al pomodoro + proteine + verdure":[["Pasta",80,"g"],["Passata di pomodoro",120,"g"],["Fonte proteica",150,"g"],["Verdure",150,"g"]],
+"Riso + tonno + verdure":[["Riso",80,"g"],["Tonno",120,"g"],["Verdure",200,"g"]],
+"Pasta + legumi + verdure":[["Pasta",80,"g"],["Legumi",150,"g"],["Verdure",200,"g"]],
+"Pesce + verdure + pane":[["Pesce",180,"g"],["Verdure",200,"g"],["Pane",60,"g"]],
+"Pesce + verdure":[["Pesce",180,"g"],["Verdure",200,"g"]],
+"Uova + verdure + pane":[["Uova",2,"pz"],["Verdure",200,"g"],["Pane",60,"g"]],
+"Carne + verdure + pane":[["Carne",180,"g"],["Verdure",200,"g"],["Pane",60,"g"]],
+"Pizza margherita + contorno":[["Pizza margherita",1,"pz"],["Verdure",150,"g"]],
+"Pasto libero":[],
+"Pranzo libero":[],
+"Cena libera":[]
+};
+
+const options={
+"Colazione":["Yogurt greco + muesli + frutta","Latte + cereali + frutta","Pane + marmellata + yogurt","Cappuccino + brioche","Uova + pane","Personalizzata"],
+"Spuntino mattina":["Frutta","Yogurt","10 mandorle","Frutta secca","Nessuno","Personalizzata"],
+"Pranzo":["Pasta + verdure + pollo","Riso + pollo + verdure","Pasta al pomodoro + proteine + verdure","Riso + tonno + verdure","Pasta + legumi + verdure","Pasto libero","Personalizzato"],
+"Spuntino pomeriggio":["Frutta","Yogurt","10 mandorle","Frutta secca","Nessuno","Personalizzato"],
+"Cena":["Pesce + verdure + pane","Uova + verdure + pane","Carne + verdure + pane","Pesce + verdure","Pizza margherita + contorno","Cena libera","Personalizzata"]
+};
+
+const defaults=[
+["Yogurt greco + muesli + frutta","Frutta","Pasta + verdure + pollo","10 mandorle","Pesce + verdure + pane"],
+["Latte + cereali + frutta","Yogurt","Riso + pollo + verdure","Frutta secca","Uova + verdure + pane"],
+["Yogurt greco + muesli + frutta","Frutta","Pasta al pomodoro + proteine + verdure","Yogurt","Pesce + verdure"],
+["Pane + marmellata + yogurt","Frutta","Riso + tonno + verdure","10 mandorle","Carne + verdure + pane"],
+["Yogurt greco + muesli + frutta","Frutta","Pasta + legumi + verdure","Frutta secca","Pesce + verdure + pane"],
+["Cappuccino + brioche","Frutta","Pasto libero","Nessuno","Cena libera"],
+["Cappuccino + brioche","Nessuno","Pranzo libero","Nessuno","Pizza margherita + contorno"]
+];
+
+let data=load();
+function load(){
+ try{let x=JSON.parse(localStorage.getItem("menu-data-v3"));if(x)return x}catch(e){}
+ return defaults.map(r=>r.map(name=>({name,portions:1,custom:""})));
+}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
+function render(){
+ document.getElementById("days").innerHTML=days.map((d,i)=>`<div class="day"><h2>${d}</h2>${meals.map((m,j)=>{
+   let v=data[i][j]||{name:"Nessuno",portions:1,custom:""};
+   let opts=options[m].map(o=>`<option value="${esc(o)}" ${o===v.name?"selected":""}>${o}</option>`).join("");
+   let custom=(v.name||"").toLowerCase().includes("personal");
+   return `<div class="meal"><div class="meal-title">${m}</div>
+   <div class="controls"><select onchange="changeMeal(${i},${j},this.value)">${opts}</select><input class="portions" type="number" min="0.5" step="0.5" value="${v.portions||1}" onchange="changePortions(${i},${j},this.value)" aria-label="Porzioni"></div>
+   <div class="custom ${custom?"show":""}"><input placeholder="Scrivi il pasto personalizzato" value="${esc(v.custom)}" oninput="data[${i}][${j}].custom=this.value"></div>
+   <div class="hint">Porzioni: 1 = quantità standard del pasto</div></div>`;
+ }).join("")}</div>`).join("");
+ document.getElementById("week").textContent=weekLabel();
+}
+function changeMeal(i,j,v){data[i][j].name=v;data[i][j].custom="";saveSilent();render()}
+function changePortions(i,j,v){data[i][j].portions=Math.max(.5,Number(v)||1);saveSilent()}
+function saveSilent(){localStorage.setItem("menu-data-v3",JSON.stringify(data))}
+function saveAll(){saveSilent();let s=document.getElementById("status");s.textContent="✓ Settimana salvata su questo dispositivo";setTimeout(()=>s.textContent="",2500)}
+function resetWeek(){data=defaults.map(r=>r.map(name=>({name,portions:1,custom:""})));saveAll();render()}
+function copyWeek(){localStorage.setItem("menu-backup-v3",JSON.stringify(data));document.getElementById("status").textContent="✓ Settimana copiata. Potrai recuperarla nella prossima versione.";setTimeout(()=>status.textContent="",3000)}
+function weekLabel(){let d=new Date(),n=d.getDay()||7,m=new Date(d);m.setDate(d.getDate()-n+1);let s=new Date(m);s.setDate(m.getDate()+6);return `${m.toLocaleDateString("it-IT",{day:"2-digit",month:"long"})} – ${s.toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"})}`}
+function buildShopping(){
+ let sums={};
+ data.flat().forEach(v=>{
+   let r=recipes[v.name]||[];
+   let mult=Number(v.portions)||1;
+   r.forEach(([name,qty,unit])=>{
+     let k=name+"|"+unit;sums[k]=(sums[k]||0)+qty*mult;
+   });
+ });
+ let groups={"Frutta e verdura":["Frutta","Verdure","Passata di pomodoro"],"Carne e pesce":["Petto di pollo","Pesce","Tonno","Carne","Fonte proteica"],"Latticini e uova":["Yogurt greco","Latte","Uova"],"Pane e cereali":["Pane","Pasta","Riso","Muesli","Cereali","Legumi"],"Dispensa":["Mandorle","Frutta secca","Marmellata","Caffè + latte","Brioche","Pizza margherita"]};
+ let html="";
+ Object.entries(groups).forEach(([g,names])=>{
+   let rows=Object.entries(sums).filter(([k])=>names.includes(k.split("|")[0]));
+   if(rows.length)html+=`<div class="cat"><h3>${g}</h3>${rows.map(([k,q])=>{let [name,unit]=k.split("|");let amount=Number.isInteger(q)?q:q.toFixed(1);return `<label class="item"><input type="checkbox"> ${name}<span class="amount">${amount} ${unit}</span></label>`}).join("")}</div>`;
+ });
+ document.getElementById("list").innerHTML=html||`<div class="empty">Nessun ingrediente da aggiungere.</div>`;
+}
 function clearChecks(){document.querySelectorAll("#list input").forEach(x=>x.checked=false)}
+function showTab(id){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");nm.classList.toggle("active",id==="menu");ns.classList.toggle("active",id==="shopping");if(id==="shopping")buildShopping()}
 render();
-</script></body></html>
+</script>
+</body></html>
