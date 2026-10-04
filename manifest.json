@@ -1,9 +1,0 @@
-{
-  "name":"Menu settimanale",
-  "short_name":"Menu",
-  "start_url":"./",
-  "display":"standalone",
-  "background_color":"#f4f5f7",
-  "theme_color":"#18212b",
-  "lang":"it"
-}
